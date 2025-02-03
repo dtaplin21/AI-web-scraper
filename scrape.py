@@ -1,5 +1,6 @@
-import selenium.webdriver as webdriver
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver import Remote, ChromeOptions
+from selenium.webdriver.chromium.remote_connection import ChromiumRemoteConnection
+from selenium.webdriver.common.by import By
 import time
 
 def scrape_website(website):
@@ -8,17 +9,19 @@ def scrape_website(website):
 
     sbr_connection = ChromiumRemoteConnection(SBR_WEBDRIVER, 'goog', 'chrome')
     with Remote(sbr_connection, options=ChromeOptions()) as driver:
-        print('Connected! Navigating...')
-        driver.get('https://example.com')
-        print('Taking page screenshot to file page.png')
-        driver.get_screenshot_as_file('./page.png')
+        driver.get(website)
+
+        print('waiting for capcha to solve...')
+        solve_res = driver.execute('executeCdpCommand', {
+           'cmmd': 'Captcha.waitForSolve',
+           'params': {'detectTimeout': 10000},
+        })
+        print('Capcha solve status:', solve_res['value'['status']])
         print('Navigated! Scraping page content...')
         html = driver.page_source
-        print(html)
+        return html
 
-from selenium.webdriver import Remote, ChromeOptions
-from selenium.webdriver.chromium.remote_connection import ChromiumRemoteConnection
-from selenium.webdriver.common.by import By
+
 AUTH = 'brd-customer-hl_97f6e034-zone-ai_scraper:76q03ch4g3jf'
 SBR_WEBDRIVER = f'https://{AUTH}@brd.superproxy.io:9515'
 
