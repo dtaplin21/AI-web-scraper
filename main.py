@@ -19,5 +19,15 @@ if st.button("Scrape Site"):
 
     st.session_state.dom_content = cleaned_content   #store in session for streamlit
 
-    with st.expander("View DOM Content"):
+    with st.expander("View DOM Content"):  # allows it to expand to view the content inside the function call
         st.text_area("DOM Content", cleaned_content, height=300)
+
+
+if "dom_content" in st.session_state:
+    parse_description = st.text_area("Describe what you want to parse?")
+
+    if st.button("Parse Content"):
+        if parse_description:
+            st.write("Parsing the content")
+
+            dom_chunks = split_dom_content(st.session_state.dom_content)
